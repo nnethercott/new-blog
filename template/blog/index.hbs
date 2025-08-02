@@ -1,9 +1,9 @@
 {{#> base}}
 	{{#*inline "head"}}
-		<title>Sabrina Jewson's Blog</title>
-		<meta property="og:title" content="Sabrina Jewson's Blog">
+		<title>Nate Nethercott's Blog</title>
+		<meta property="og:title" content="Nate Nethercott's Blog">
 
-		<link type="application/atom+xml" rel="alternate" href="{{feed}}" title="Sabrina Jewson's Blog">
+		<link type="application/atom+xml" rel="alternate" href="{{feed}}" title="Nate Nethercott's Blog">
 	{{/inline}}
 	{{#*inline "body"}}
 		<h1>
@@ -15,12 +15,14 @@
 		{{#each posts}}
 			<li>
 				{{#if content}}
-					<a href="{{stem}}">{{content.markdown.title}}</a>
 					{{#if content.metadata.published}}
-						(<time datetime="{{content.metadata.published}}">{{content.metadata.published}}</time>)
+            <span style="margin-right: 0.6em">
+              <time datetime="{{content.metadata.published}}">{{content.metadata.published}}</time>
+            </span>
 					{{else}}
 						(draft)
 					{{/if}}
+					<a href="{{stem}}">{{content.markdown.title}}</a>
 				{{else}}
 					<a href="{{stem}}">Error generating post from {{stem}}.md</a>
 				{{/if}}
