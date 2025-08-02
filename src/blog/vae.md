@@ -132,7 +132,7 @@ When you train the model you still get a VAE which can produce realistic generat
 </div>
 <em>Generations for a VAE with spike and slab prior; latent_dim=10, p=0.8, c^2 = 0.05</em>
 
-What's different about this model and the normal VAE is that when we encode images we only have a few non-zero components in the embedding representation.  If the embedding space is $$d$$-dimensional we expect the model to activate only $$p*d$$ dimensions after training, which we can see by looking at the image below:
+What's different about this model and the normal VAE is that when we encode images we only have a few non-zero components in the embedding representation.  If the embedding space is $d$-dimensional we expect the model to activate only $p*d$ dimensions after training, which we can see by looking at the image below:
 
 <div style="text-align: center;">
     <img src="/media/vae_post/latent_vis.png" style="width: 100%; display: block; margin: 0 auto;">
