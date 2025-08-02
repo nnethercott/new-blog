@@ -33,7 +33,16 @@
 			dependency("/{{common_css}}");
 		</script>
 		{{/if}}
-
+    <script>
+      window.MathJax = {
+        tex: {
+          packages: {'[+]': ['ams']},
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']]
+        }
+      };
+		</script>
+		<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
 		{{> head}}
 	</head>
 	<body>
