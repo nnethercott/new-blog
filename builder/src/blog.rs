@@ -183,6 +183,7 @@ struct PostContent {
 struct PostMetadata {
     published: Option<NaiveDate>,
     updated: Option<NaiveDate>,
+    description: Option<String>,
 }
 
 fn read_post(stem: Rc<str>, src: anyhow::Result<String>) -> Post {
@@ -319,6 +320,7 @@ fn build_feed(posts: &[Rc<Post>], metadata: &FeedMetadata) -> String {
                 )
                 .published(published)
                 .updated(content.metadata.updated.map_or(published, datetime))
+                .summary(content.metadata.description.clone().map(From::from))
                 .content(
                     atom_syndication::ContentBuilder::default()
                         .base(Some(post_url))
@@ -413,6 +415,7 @@ use crate::util::minify::minify;
 use crate::util::write_file;
 use crate::util::ErrorPage;
 use anyhow::Context as _;
+use atom_syndication::Text;
 use chrono::naive::NaiveDate;
 use chrono::offset::TimeZone as _;
 use chrono::DateTime;
