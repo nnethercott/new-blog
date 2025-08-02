@@ -1,9 +1,9 @@
 {
 	"published": "2023-10-23",
-  "description": "Using a spike-and-slab prior to model the latent distribution of a VAE"
+  "description": "Using a spike-and-slab prior to model the latent distribution of a variational autoencoder"
 }
 
-# Sparse Variational autoencoders
+# Sparse Bayesian priors + VAE's
 
 ## Theory {#theory}
 
@@ -11,7 +11,7 @@
     <img src="/media/vae_post/mnist.gif" style="width: 50%; display: block; margin: 0 auto;">
 </div>
 
-Before diving into it, I thought I'd mention that I've included a quick refresher on the math behind VAEs at the end of this article if you're feeling rusty ;)
+Before diving into it, I thought I'd mention that I've included a quick refresher on the math behind variational autoencoders at the end of this article if you're feeling rusty ;)
 
 The main idea is to assume a prior on the latent space where each latent, $$z_{i}$$,
 of the encoded sample, $$x$$, has some probability, $$p$$

@@ -1,5 +1,5 @@
 {
-	"published": "2025-08-01",
+	"published": "",
   "description": "A rust port of Meta's FAISS HNSW implementation using lmdb"
 }
 
