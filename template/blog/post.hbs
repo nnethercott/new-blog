@@ -11,12 +11,6 @@
 		<link type="application/atom+xml" rel="alternate" href="{{feed}}" title="Nate Nethercott's Blog">
 	{{/inline}}
 	{{#*inline "body"}}
-		<h1>{{{post.markdown.title}}}</h1>
-    <blockquote id="description">
-      {{#if post.metadata.description}}
-        {{post.metadata.description}}
-      {{/if}}
-    </blockquote>
 		<p id="published">
 			{{#if post.metadata.published}}
 				<time datetime="{{post.metadata.published}}">{{post.metadata.published}}</time>
@@ -27,6 +21,12 @@
 				(updated <time datetime="{{post.metadata.updated}}">{{post.metadata.updated}}</time>)
 			{{/if}}
 		</p>
+		<h1>{{{post.markdown.title}}}</h1>
+    <blockquote id="description">
+      {{#if post.metadata.description}}
+        {{post.metadata.description}}
+      {{/if}}
+    </blockquote>
 		<nav>{{{post.markdown.outline}}}</nav>
 		{{{post.markdown.body}}}
 

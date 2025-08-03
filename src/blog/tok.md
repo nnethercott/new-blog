@@ -1,47 +1,51 @@
 {
 	"published": "2024-05-10",
-  "description": "An O(log n) optimization I found to speed up tokenizer throughput"
+  "description": "An O(m*log n) optimization I found to speed up tokenizer throughput"
 }
 
 # Fast byte pair encoding in rust
 
 ## Motivation {#motivation}
 
-In this article I'll run through how I used Rust and [pyo3](https://github.com/PyO3/pyo3) to implement a fast BPE tokenizer (4x faster than [tokenizers](https://github.com/huggingface/tokenizers) and as fast as [tiktoken](https://github.com/openai/tiktoken)) which you can install from PyPI today!
+In this article I'll run through how I used Rust and pyo3 to implement a fast BPE tokenizer (4x faster than [tokenizers](https://github.com/huggingface/tokenizers) and as fast as [tiktoken](https://github.com/openai/tiktoken)) which you can install from PyPI today!
 
-All the code mentioned in this post can be found on github [at this repo 🪙](https://github.com/nnethercott/tok).
+All the code mentioned in this post can be found [on github](https://github.com/nnethercott/tok).
 
 <figure>
 <div style="text-align: center;">
-    <img src="/media/tok_post/performance.png" style="width: 80%; display: block; margin: 0 auto;" >
-      <figcaption>Speed comparison between my tokenizer (yellow) and popular libraries like Hugging Face and OpenAI</figcaption>
+    <img src="/static/images/tok_post/performance.png" style="width: 80%; display: block; margin: 0 auto;" >
+    <figcaption>
+      Speed comparison between my tokenizer (yellow) and popular libraries like Hugging Face and OpenAI
+    </figcaption>
 </div>
 </figure>
 
 
 
-I'm mainly going to write about an efficient way I discovered to quickly encode and decode sequences using a pretrained tokenizer instead of an in-depth review of byte-pair encoding. For that check out any one of these links: [wikipedia](https://en.wikipedia.org/wiki/Byte_pair_encoding), [huggingface](https://huggingface.co/learn/nlp-course/en/chapter6/5), [tiktoken](https://github.com/openai/tiktoken).
+This article is about an efficient way I discovered to quickly encode and decode sequences using a pretrained tokenizer rather than an in-depth review of byte-pair encoding. For that feel free to check out any of these links: [wikipedia](https://en.wikipedia.org/wiki/Byte_pair_encoding), [huggingface](https://huggingface.co/learn/nlp-course/en/chapter6/5), [tiktoken](https://github.com/openai/tiktoken).
 
 
 ## A naive approach - *O(mn)* {#naive}
 
-Suppose you've already trained a tokenizer, i.e. you have a wrapper around a hashmap that lets you map a sequence of bytes to unique tokens. What's the fastest way to use this lookup table to encode and decode your data?
+Suppose you've already trained a tokenizer (doing this is trivial), i.e. you have a some hashmap-like object that lets you map a sequence of bytes to unique tokens. What's the fastest way to use this lookup table to encode and decode your data?
 
 <!-- ### A basic approach -->
 
-The first idea that comes to mind might be to loop over all the possible token merges in the order we learned them and replace any matches we find along the way. For example, if your tokenizer has the following token mapping rules:
+The easiest approach is to loop over all the possible token merges in the order we learned them and replace any matches we find along the way. For example, if your tokenizer has the following token mapping rules:
 
 ```
 {(97, 97): 128, (128,97): 129, (129, 98): 130}
 ```
 
-Then the encoding for "aaabcaaab" (or [97,97,97,98,99,97,97,97,98] as a byte array) would go sequentially like (notice how everything gets *compressed*):
+Then the encoding for "aaabcaaab" (or [97,97,97,98,99,97,97,97,98] as a byte array) would look like this (notice how everything gets *compressed*):
 
+```
 1. [97,97,97,98,99,97,97,97,98] -> [128,97,98,99,128,97,98]
 2. [128,97,98,99,128,97,98] -> [129,98,99,129,98]
 3. [129,98,99,129,98] -> [130,99,130]
+```
 
-In Rust that procedure might look like:
+In Rust you can write that loop as:
 
 ```rust
 use std::collections::HashMap;
@@ -58,40 +62,35 @@ fn _byte_pair_merge(pieces: &mut Vec<Rank>, pair: (Rank, Rank), replace: Rank) {
     }
 }
 
-fn encode(text: &str, map: &HashMap<(Rank,Rank), Rank>) -> Vec<Rank>{
-  let mut pieces: Vec<Rank> = text.as_bytes()
-                            .iter()
-                            .map(|&x| x as Rank)
-                            .collect();
-  //reverse (k,v) to (v,k)
-  let reverse_map: HashMap<Rank, (Rank, Rank)> = map.iter()
-                                      .map(|(&p, &r)| (r, p))
-                                      .collect();
+fn encode(text: &str, map: &HashMap<(Rank, Rank), Rank>) -> Vec<Rank> {
+    let mut pieces: Vec<Rank> = text.as_bytes().iter().map(|&x| x as Rank).collect();
+    //reverse (k,v) to (v,k)
+    let reverse_map: HashMap<Rank, (Rank, Rank)> = map.iter().map(|(&p, &r)| (r, p)).collect();
 
-  //O(m*n)
-  //assume first token has index 128 since we're encoding for ascii
-  (128..=reverse_map.len() + 128).rev().for_each(|i| {
-      let &pair = reverse_map.get(&(i as Rank)).unwrap();
-      _byte_pair_merge(&mut pieces, pair, i as Rank);
-  });
+    //O(m*n)
+    //assume first token has index 128 since we're encoding for ascii
+    (128..=reverse_map.len() + 128).rev().for_each(|i| {
+        let &pair = reverse_map.get(&(i as Rank)).unwrap();
+        _byte_pair_merge(&mut pieces, pair, i as Rank);
+    });
 
-  pieces
+    pieces
 }
 ```
 
 For a vocabulary size of 50257, the token throughput with this approach for a 2.5MB subset of the [wikitext dataset](https://huggingface.co/datasets/wikitext) is somewhere in the neighborhood of **0.09MB/s**.
 
-This approach definitely gets the job done but it's incredibly inefficient! Indeed, this solution has a time complexity of $$O(mn)$$, where $$m$$ is the vocab size and $$n$$ is the length of the text you want to encode. As the vocabulary size and/or length of the text increase we get significant slowdowns.
+This approach definitely gets the job done but it's incredibly inefficient! Indeed, this solution has a time complexity of $O(mn)$, where $m$ is the vocab size and $n$ is the length of the text you want to encode. As the vocabulary size and/or length of the text increase we get significant slowdowns.
 
 ## A better solution  - *O(m log(n))* {#efficient}
 
-The approach I ended up stumbling across after around 6 hours of refactoring is closer to $$O(m\log{n})$$. It relies on the fact that we don't need to loop over every entry in the hashmap when it's sufficient to notice that we can apply merges in a way which respects the order the tokenizer learned them in. This lets us apply multiple different token merges in a single pass instead of only searching for a single pattern each time. We can also detect early on if no more token merging is possible and break out of the function.
+The approach I ended up stumbling across after around 6 hours of refactoring is closer to $O(m\log{n})$. It relies on the fact that we don't need to loop over every entry in the hashmap when it's sufficient to notice that we can apply merges in a way which respects the order the tokenizer learned them in. This lets us apply multiple different token merges in a single pass instead of only searching for a single pattern each time. We can also detect early on if no more token merging is possible and break out of the function.
 
 If you've been grinding your fair share of Leetcode this sort of [two-pointers approach](https://www.geeksforgeeks.org/dsa/two-pointers-technique/) should feel familiar...
 
 ```rust
 //lib.rs
-fn encode(text: &str, map: Map<(Rank,Rank), Rank>) -> Vec<Rank> {
+fn encode(text: &str, map: Map<(Rank, Rank), Rank>) -> Vec<Rank> {
     let mut pieces: Vec<Rank> = text.as_bytes().iter().map(|&x| x as Rank).collect();
 
     loop {
