@@ -1,5 +1,4 @@
-Hi!
-This is a blog/devlog where I write about stuff I'm interested in (these days that's Rust, ML, and infra).
+Hey, it's Nate! This is a blog/devlog where I write about stuff I'm interested in (these days that's Rust, ML, and infra).
 
 This site's original source code is [available on GitHub](https://github.com/SabrinaJewson/sabrinajewson.github.io).
 All content on the site is available under MIT, Apache-2.0, or CC BY 4.0.
