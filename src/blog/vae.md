@@ -27,7 +27,9 @@ $$
 $$
 </div>
 
-Our goal is to make the VAE learn how to encode and decode samples in a sparse fashion, i.e. where lots of info is "zeroed out". Sparsity is nice mathematically and in a sec we'll see what that looks like with a real demo on the MNIST dataset. Also observe that we can throttle the sparsity through our choice of $p$; $p=1$ means most of the embedding dimensions are uninformative, and $p=0$ recovers the original VAE. The edge cases aren't that interesting so we'll take a value in between, $0<p<1$.
+Our goal is to make the VAE learn how to encode and decode samples in a sparse fashion, i.e. where lots of info is "zeroed out". Sparsity is nice mathematically and in a sec we'll see what that looks like with a real demo on the MNIST dataset.
+
+It's important to observe that we can throttle the sparsity through our choice of $p$; $p=1$ means most of the embedding dimensions are uninformative, and $p=0$ recovers the original VAE. The edge cases aren't that interesting so we'll take a value in between, $0<p<1$.
 
 We'll also assume :
 - $z_{i}|x \sim \mathcal{N}(\mu_{\phi}(x),\sigma^{2}_{\phi}(x))$
@@ -138,7 +140,7 @@ When you train the model you still get a VAE which can produce realistic generat
 What's different about this model and the normal VAE is that when we encode images we only have a few non-zero components in the embedding representation.  If the embedding space is $d$-dimensional we expect the model to activate only $p*d$ dimensions after training, which we can see by looking at the image below:
 
 <figure style="text-align: center;">
-    <img src="/static/images/vae_post/latent_vis.png" 
+    <img src="/static/images/vae_post/latent_vis.png"
          alt="Latent representations for different sample images using a trained model"
          style="width: 100%; display: block; margin: 0 auto;">
     <figcaption>
