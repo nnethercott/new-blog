@@ -212,7 +212,7 @@ so that
 
 <div>
 $$
-\mathcal{L}(\theta, \phi;x) =  \mathbb{E}_{z\sim q_{\phi}(\cdot|x)}\left[\log p_{\theta}(x|z)\right] - D_{KL}(q_{\phi}(z|x)||p(z))
+\mathcal{L}(\theta, \phi;x) =  \mathbb{E}_{z\sim q_{\phi}(\cdot|x)}\left[\log p_{\theta}(x|z)\right] - D_{KL}(q_{\phi}(z|x)||p(z)) \tag{1}
 $$
 </div>
 
