@@ -117,7 +117,7 @@ $$
 \end{align*}
 $$
 &lt;/div&gt;
-&lt;p&gt;Our goal is to make the VAE learn how to encode and decode samples in a sparse fashion, i.e. where lots of info is “zeroed out”. Sparsity is nice mathematically and in a sec we’ll see what that looks like with a real demo on the MNIST dataset. Also observe that we can throttle the sparsity through our choice of $p$; $p=1$ means most of the embedding dimensions are uninformative, and $p=0$ recovers the original VAE. The edge cases aren’t that interesting so we’ll take a value in between, $0&amp;lt;p&amp;lt;1$.&lt;/p&gt;&lt;p&gt;We’ll also assume :&lt;/p&gt;&lt;ul&gt;&lt;li&gt;$z_{i}|x \sim \mathcal{N}(\mu_{\phi}(x),\sigma^{2}_{\phi}(x))$&lt;/li&gt;&lt;li&gt;and $x_{i}|z \sim Be(\theta(z))$.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;That last choice is mainly since I’m going to show some examples using grayscale images and we want our generated outputs being a value truncated between 0 and 1.&lt;/p&gt;&lt;!-- &gt; Notice that: $$p(z_{i}) = \int p(z_{i}, \gamma_{i})p(d\gamma_{i}) = (1-p)\cdot \varphi(x;0,c^{2}) + p\cdot \varphi(x;0,1)$$. --&gt;
+&lt;p&gt;Our goal is to make the VAE learn how to encode and decode samples in a sparse fashion, i.e. where lots of info is “zeroed out”. Sparsity is nice mathematically and in a sec we’ll see what that looks like with a real demo on the MNIST dataset.&lt;/p&gt;&lt;p&gt;It’s important to observe that we can throttle the sparsity through our choice of $p$; $p=1$ means most of the embedding dimensions are uninformative, and $p=0$ recovers the original VAE. The edge cases aren’t that interesting so we’ll take a value in between, $0&amp;lt;p&amp;lt;1$.&lt;/p&gt;&lt;p&gt;We’ll also assume :&lt;/p&gt;&lt;ul&gt;&lt;li&gt;$z_{i}|x \sim \mathcal{N}(\mu_{\phi}(x),\sigma^{2}_{\phi}(x))$&lt;/li&gt;&lt;li&gt;and $x_{i}|z \sim Be(\theta(z))$.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;That last choice is mainly since I’m going to show some examples using grayscale images and we want our generated outputs being a value truncated between 0 and 1.&lt;/p&gt;&lt;!-- &gt; Notice that: $$p(z_{i}) = \int p(z_{i}, \gamma_{i})p(d\gamma_{i}) = (1-p)\cdot \varphi(x;0,c^{2}) + p\cdot \varphi(x;0,1)$$. --&gt;
 &lt;p&gt;Okay so here’s the bad news: unfortunately no closed form for the KL-divergence between our mixture model prior and the posterior exists. The good news: we can just estimate the KL loss through &lt;a href=&quot;https://en.wikipedia.org/wiki/Monte_Carlo_method&quot;&gt;Monte Carlo&lt;/a&gt; pretty easily:&lt;/p&gt;&lt;div&gt;
 $$
 \begin{align*}
@@ -191,7 +191,7 @@ $$
     &lt;/figcaption&gt;
 &lt;/figure&gt;
 &lt;p&gt;What’s different about this model and the normal VAE is that when we encode images we only have a few non-zero components in the embedding representation.  If the embedding space is $d$-dimensional we expect the model to activate only $p*d$ dimensions after training, which we can see by looking at the image below:&lt;/p&gt;&lt;figure style=&quot;text-align: center;&quot;&gt;
-    &lt;img src=&quot;/static/images/vae_post/latent_vis.png&quot; 
+    &lt;img src=&quot;/static/images/vae_post/latent_vis.png&quot;
          alt=&quot;Latent representations for different sample images using a trained model&quot;
          style=&quot;width: 100%; display: block; margin: 0 auto;&quot;&gt;
     &lt;figcaption&gt;
