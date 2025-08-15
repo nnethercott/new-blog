@@ -27,7 +27,7 @@ This article is about an efficient way I discovered to quickly encode and decode
 
 ## A naive approach - *O(mn)* {#naive}
 
-Suppose you've already trained a tokenizer (doing this is trivial), i.e. you have a some hashmap-like object that lets you map a sequence of bytes to unique tokens. What's the fastest way to use this lookup table to encode and decode your data?
+Suppose you've already trained a tokenizer, i.e. you have a some hashmap-like object that lets you map a sequence of bytes to unique tokens. What's the fastest way to use this lookup table to encode and decode your data?
 
 <!-- ### A basic approach -->
 
