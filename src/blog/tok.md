@@ -3,7 +3,7 @@
   "description": "An O(m*log n) optimization I found to speed up tokenizer throughput"
 }
 
-# Fast byte pair encoding in rust
+# My tokenizer is faster than yours (maybe)
 
 In this article I'll run through how I used Rust and pyo3 to implement a fast BPE tokenizer (4x faster than [tokenizers](https://github.com/huggingface/tokenizers) and as fast as [tiktoken](https://github.com/openai/tiktoken)) which you can install from PyPI today!
 
