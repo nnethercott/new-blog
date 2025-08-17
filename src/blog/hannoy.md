@@ -3,14 +3,17 @@
   "description": "This is the first in a series of articles on my experiences building hannoy; a key-value backed hnsw implementation in rust using LMDB."
 }
 
+<!-- # From 2-Day Builds to 2-Hour KV-Backed HNSW -->
 # KV-backed HNSW in rust, Part I
 
 ## A bit of context {#context}
-Back in April I started contributing to an open-source vector db called [arroy](https://github.com/meilisearch/arroy) created by [Meilisearch](https://github.com/meilisearch/meilisearch) to handle semantic search in their product. It was a lot of fun, and eventually I got talking with their CTO about rewriting the project using a graph-based techniques instead of k-d trees purely out of curiosity since that's more or less the approach all major providers are taking these days.
+Back in April I started contributing to an open-source vector db called [arroy](https://github.com/meilisearch/arroy) created by [Meilisearch](https://github.com/meilisearch/meilisearch) to handle semantic search in their product. It was a lot of fun, and eventually I got talking with their CTO about rewriting the project using a graph-based techniques instead of k-d trees purely out of scientific curiosity. 
+
+Their current system was using [LMDB](https://en.wikipedia.org/wiki/Lightning_Memory-Mapped_Database) to circumvent the limitations of most vector db's which store the index entirely in memory. This way you could perform search over 1TB of data on a single replica without needing 1TB of RAM, albeit at the cost of higher latency due to SSD reads. It was important to keep this feature for a few reasons, firstly I didn't want to offend the CTO who also maintains the official rust bindings for LMDB, and second, I'm all about democratizing access to AI -- [you shouldn't need 3 machines to run your index](https://blog.wilsonl.in/diskann/).
 
 The project that came out of this effort was [**hannoy**](https://github.com/nnethercott/hannoy). As it turns out, making this switch brought significant performance boosts; indexes took up half the previous disk space, build times were cut down from 2 days to 2 hours, and search became 10x faster. Currently [hannoy is on track to replace arroy in Meilisearch](https://github.com/meilisearch/meilisearch/pull/5767).
 
-I learned a lot developing hannoy and figured I'd write it down for posteriority as well as for others who may be interested by the subject.
+I learned a lot developing hannoy and figured I'd write it down for posteriority as well as for others who may be interested by the subject. I'll also make the bold claim here that hannoy is more DiskANN than it is hnsw. 
 
 In this and subsequent articles, I'll go through vector search fundamentals, provide overviews of popular approaches, and show code samples for various implementation details.
 
@@ -29,7 +32,7 @@ These "embeddings" correspond to vectorized media like documents or images, and 
 
 Here, $d$ is a [metric](https://en.wikipedia.org/wiki/Metric_space) satisfying $d: \mathbb{R}^{d} \times \mathbb{R}^{d} \mapsto \mathbb{R}$.
 
-The industry standard is just to use the cosine distance all the time which has the nice advantage of being semantically interpretable ($x^{*}$ is the vector in our db that makes the smallest angle with $q$) but there are plenty of other valid choices. For instance, Hannoy currently supports Euclidean, Cosine, Hamming, Manhattan, and various quantized versions thereof !
+The industry standard is just to use the cosine distance all the time which has the nice advantage of being semantically interpretable ($x^{*}$ is the vector in our db that makes the smallest angle with $q$) but there are plenty of other valid choices. For instance, Hannoy currently supports Euclidean, Cosine, Hamming, Manhattan, and various quantized versions thereof. 
 
 It turns out [(1)](#eq1) is actually just a specific case of $k$-nearest neighbour search with $k=1$, who's objective can be generalized as:
 
