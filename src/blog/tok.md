@@ -3,7 +3,7 @@
   "description": "An O(m*log n) optimization I found to speed up tokenizer throughput"
 }
 
-# Fast byte pair encoding in rust
+# My tokenizer is faster than yours (maybe)
 
 ## Motivation {#motivation}
 
