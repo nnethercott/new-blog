@@ -3,7 +3,7 @@
   "description": "Using a spike-and-slab prior to model the latent distribution of a variational autoencoder"
 }
 
-# Sparse Bayesian priors + VAE's
+# Sparse Bayesian priors for training variational autoencoders
 
 ## Theory {#theory}
 

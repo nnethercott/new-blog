@@ -26,6 +26,7 @@ nav > a {
 	font-size: 24px;
 	font-weight: bold;
 	text-decoration: none;
+  line-height: 1em;
 }
 
 main {
@@ -42,7 +43,8 @@ a:hover {
 	opacity: 0.7;
 }
 .md-body a {
-  color: #0000EE;        /* default blue */
+  color: #0055ff;        /* default blue */
+  /* color: #0000EE;        /* default blue */
   text-decoration: none;
 }
 .md-body a:focus {

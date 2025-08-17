@@ -35,3 +35,7 @@ pre.scode {
 .back {
 	margin-top: 3em;
 }
+
+h1.title{
+  line-height: 1.2em;
+}
