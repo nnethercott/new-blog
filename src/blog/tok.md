@@ -1,7 +1,8 @@
 {
 	"published": "2024-05-10",
-  "description": "An O(m*log n) optimization I found to speed up tokenizer throughput"
+  "description": ""
 }
+<!-- "description": "An O(m*log n) optimization I found to speed up tokenizer throughput" -->
 
 # My tokenizer is faster than yours (probably)
 
@@ -23,7 +24,7 @@ All the code mentioned in this post can be found [on github](https://github.com/
 This article is about an efficient way I discovered to quickly encode and decode sequences using a pretrained tokenizer rather than an in-depth review of byte-pair encoding. For that feel free to check out any of these links: [wikipedia](https://en.wikipedia.org/wiki/Byte_pair_encoding), [huggingface](https://huggingface.co/learn/nlp-course/en/chapter6/5), [tiktoken](https://github.com/openai/tiktoken).
 
 
-## A naive approach - *O(mn)* {#naive}
+## An *O(mn)* first attempt {#naive}
 
 Suppose you've already trained a tokenizer (doing this is trivial), i.e. you have a some hashmap-like object that lets you map a sequence of bytes to unique tokens. What's the fastest way to use this lookup table to encode and decode your data?
 
@@ -80,7 +81,7 @@ For a vocabulary size of 50257, the token throughput with this approach for a 2.
 
 This approach definitely gets the job done but it's incredibly inefficient! Indeed, this solution has a time complexity of $O(mn)$, where $m$ is the vocab size and $n$ is the length of the text you want to encode. As the vocabulary size and/or length of the text increase we get significant slowdowns.
 
-## A better solution  - *O(m log(n))* {#efficient}
+## Leetcode maxxing: An *O(m log(n))* solution !{#efficient}
 
 The approach I ended up stumbling across after around 6 hours of refactoring is closer to $O(m\log{n})$. It relies on the fact that we don't need to loop over every entry in the hashmap when it's sufficient to notice that we can apply merges in a way which respects the order the tokenizer learned them in. This lets us apply multiple different token merges in a single pass instead of only searching for a single pattern each time. We can also detect early on if no more token merging is possible and break out of the function.
 
@@ -139,7 +140,7 @@ On the same wikitext split our throughput using this encoding algorithm jumps to
 
 I took a lot of inspiration from official [openai implementation](https://github.com/openai/tiktoken/blob/main/src/lib.rs) in their repo `tiktoken` but handled the merging aspect quite differently by leveraging the fact that we could store the prospective merges in a stack instead of finding the single-best merge at each iteration.
 
-## Python bindings {#python-bindings}
+## Python bindings with pyo3 {#python-bindings}
 
 To expose the Rust code in Python I made use of [pyo3](https://github.com/PyO3/pyo3) and [maturin](https://github.com/PyO3/maturin). Getting started with these libraries is incredibly easy and just requires adding a few pyo3 attributes to your existing rust code. What's also nice is that maturin automatically adds a CI workflow to your project which makes distributing your python package infinitely easier. By default the workflow listens for new tag pushes to the main branch and builds the wheels for all the major platforms.
 

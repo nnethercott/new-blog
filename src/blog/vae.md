@@ -1,15 +1,16 @@
 {
 	"published": "2023-10-23",
-  "description": "Using a spike-and-slab prior to model the latent distribution of a variational autoencoder"
+  "description": ""
 }
+<!-- "Using a spike-and-slab prior to model the latent distribution of a variational autoencoder" -->
 
 # Sparse Bayesian priors for training variational autoencoders
 
-## Theory {#theory}
+## VAE Overview {#theory}
 
 Before diving into it, I thought I'd mention that I've included a quick refresher on the math behind variational autoencoders (VAE's) at the end of this article if you're feeling rusty ;)
 
-Standard VAE's use normal distributions everywhere, mainly since the math works out nicely when calculating posteriors. I was curious to see how this architecture would behave if instead I changed some underlying assumptions, and modeled the latent space using a ["spike-and-slab"](https://en.wikipedia.org/wiki/Spike-and-slab_regression) prior.
+Standard VAE's use normal distributions everywhere, mainly since the math works out nicely when calculating posteriors. I was curious to see how this architecture would behave if instead I changed some underlying assumptions, and modeled the latent space using a [spike-and-slab](https://en.wikipedia.org/wiki/Spike-and-slab_regression) prior.
 
 <div style="text-align: center;">
     <img src="/static/images/vae_post/mnist.gif" style="width: 50%; display: block; margin: 0 auto;">
@@ -64,7 +65,7 @@ $$
 
 So we're looking to minimize the binary cross entropy pixel-wise across the image! We can just use a classic `torch.nn.functional.binary_cross_entropy` in the code for our reconstruction loss.
 
-## Code {#code}
+## Basic PyTorch implementation {#code}
 Using PyTorch and torch.distributions we can easily implement everything we were just talking about.
 
 First let's handle the distributional aspects:
@@ -150,8 +151,10 @@ What's different about this model and the normal VAE is that when we encode imag
 
 There you go! A sparse variational autoencoder which was obtained just from making a few different choices in the statistical scaffolding of the model. I should also note that spike and slab and normal of course aren't the only choices when designing your VAEs (personal fave of mine is Gumbel Softmax).
 
-## Quick refresher on VAE's {#refresher}
-In terms of the original VAE proposed (rather offhandedly) by Kingma and Welling in 2014, the story goes something like this: suppose we want to learn the underlying distribution for some data (e.g. images) namely for the purpose of generating samples artificially. Just like in GANs we'd like to be able to convert some samples drawn from a parametric distribution into ones which might have come from our real data generator. This is where the **probibalistic decoder**, $\theta$, comes into play. The goal of $\theta$ is to map low-dimensional noise into hyperparameters of a parametric distribution which generates realistic high-dimensional samples.  Think $x|z \sim f(\theta(z))$
+## Bonus: An in-depth refresher on VAE's {#refresher}
+In terms of the original VAE proposed (rather offhandedly) by Kingma and Welling in 2014, the story goes something like this: suppose we want to learn the underlying distribution for some data (e.g. images) namely for the purpose of generating samples artificially. Just like in GANs we'd like to be able to convert some samples drawn from a parametric distribution into ones which might have come from our real data generator. This is where the **probibalistic decoder**, $\theta$, comes into play. 
+
+The goal of $\theta$ is to map low-dimensional noise into hyperparameters of a parametric distribution which generates realistic high-dimensional samples.  Think $x|z \sim f(\theta(z))$
 
 One way to quantify how "good" your decoder is performing is to compute the log probability of a real sample under the decoder framework as
 
