@@ -87,3 +87,7 @@ blockquote {
 	padding-left: 10px;
 	opacity: 0.7;
 }
+
+li.post-item{
+  margin-left: 0.2em;
+}
