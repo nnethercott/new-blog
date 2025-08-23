@@ -30,7 +30,7 @@ nav > a {
 }
 
 main {
-	max-width: 80ch;
+	max-width: 85ch;
 	margin: 48px auto 0 auto;
 	padding: 0 16px;
 }
@@ -54,6 +54,10 @@ a:hover {
   color: #FF0000;        /* default red */
 }
 
+.md-body figure{
+  padding: 0;
+  margin: 0;
+}
 
 /* Headers */
 h2 {
